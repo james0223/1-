@@ -1,0 +1,37 @@
+.ovl {
+    opacity: 0 ;
+    transition: 0.5s;
+}
+
+.ovl:hover {
+    opacity: 1;
+    background: rgb(0,0,0,0.65);
+}
+.mynav:hover {
+    background-color: #ffba00;
+    color: #000;
+}
+.mainIcon {
+    color: #ffba00;
+}
+.mainPage {
+    font-family: 'Courgette', cursive;
+    margin-top: 0.5rem;
+}
+
+.target {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    line-height: 1.2;
+    height: 6em;
+    text-align: left;
+    word-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+}
+
+nav {
+    background-color: #2c2c2c;
+}

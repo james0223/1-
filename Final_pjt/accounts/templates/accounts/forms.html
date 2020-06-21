@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% block content %}
+
+{% if request.resolver_match.url_name == 'signup' %}
+    <h1>Signup</h1>
+{% elif request.resolver_match.url_name == 'update' %}
+    <h1>Update</h1>
+    <a href="{% url 'accounts:password' user.username %}">
+    <button class ='btn btn-primary'>Change Password</button><br><br>
+  </a>
+{% else %}
+    <h1>Login</h1>
+{% endif %}
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button class ='btn btn-primary'>Submit</button>
+        {% if request.resolver_match.url_name == 'login' %}
+            <a class="btn btn-primary" href="{% url 'accounts:signup' %}" role="button">Signup</a>
+        {% endif %}
+    </form>
+
+ {% endblock %}

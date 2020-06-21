@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% block content %}
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title">{{article.title}}</h5>
+        <div class="myArticleWriter">
+          {% if article.user.points < 10 %}
+            <img src="../../../../static/rank_1.png" height="35" width="35">
+          {% elif 10 <= article.user.points and article.user.points < 20 %}
+            <img src="../../../../static/rank_2.png" height="35" width="35">
+          {% elif 20 <= article.user.points and article.user.points < 30 %}
+            <img src="../../../../static/rank_3.png" height="35" width="35">
+          {% else %}
+            <img src="../../../../static/rank_4.png" height="35" width="35">
+          {% endif %}
+           <a href="{% url 'accounts:profile' article.user %}">{{article.user}}</a>
+        </div>
+        <br>
+
+      </div>
+      <div class="card-body">
+        <p class="card-text">{{article.content}}</p>
+      </div>
+      <div class="myLike">
+        <strong>LIKE: {{ article.like_users.count }}</strong>
+        {% with article_like_users=article.like_users.all %}
+          {% if request.user in article_like_users %}
+          <a href="{% url 'movies:like' article.pk %}">
+            <i class="fas fa-heart fa-lg" style="color: red;"></i>
+          </a>
+          {% else %}
+          <a href="{% url 'movies:like' article.pk %}">
+            <i class="far fa-heart fa-lg" style="color: gray;"></i>
+          </a>
+          {% endif %}
+        {% endwith %}
+      </div>
+        <br>
+
+      {% if request.user == article.user %}
+        <div class="d-flex">
+          <form action="{% url 'movies:article_delete' article.pk %}" method="POST" class='ml-auto px-1'>
+            {% csrf_token %}
+            <button class='btn btn-danger'>Delete</button>
+          </form>
+          <a href="{% url 'movies:article_update' article.pk %}" class="px-1"><button class="btn btn-primary">Edit</button></a>
+        </div>
+      {% endif %}
+      <div class='float-right'>
+        <p class="float-right">Written at : {{ article.created_at }} </p>
+      </div>
+    </div>
+    <hr>
+    {% if user.is_authenticated %}
+      <form action="{% url 'movies:comment_create' article.pk %}" method='POST'>
+		    {% csrf_token %}
+		    {% bootstrap_form form %}
+		    <button class='btn btn-dark'>Submit</button>
+	    </form>
+	  {% endif %}
+	  <hr>
+
+    <table class="table style="table-layout:fixed"">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Rank</th>
+          <th scope="col">User</th>
+          <th scope="col">Comment</th>
+          <th scope="col">Created at</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for comment in comments.all %}
+          <tr>
+            <td style="width:10%">
+              <span>
+                {% if comment.user.points < 10 %}
+                  <img src="../../../../static/rank_1.png" height="35" width="35">
+                {% elif 10 <= comment.user.points and comment.user.points < 20 %}
+                  <img src="../../../../static/rank_2.png" height="35" width="35">
+                {% elif 20 <= comment.user.points and comment.user.points < 30 %}
+                  <img src="../../../../static/rank_3.png" height="35" width="35">
+                {% else %}
+                  <img src="../../../../static/rank_4.png" height="35" width="35">
+                {% endif %}
+
+              </span>
+
+            </td>
+            <td style="width:15%"><a href="{% url 'accounts:profile' comment.user.username %}">{{ comment.user.nickname }}</a></td>
+            <td style="width:45%">{{ comment.content }}</td>
+            <td>
+              <div class="d-inline">
+                {{ comment.created_at}}
+              </div>
+
+              {% if request.user == comment.user %}
+              <div class="d-inline ">
+            		  <form action="{% url 'movies:comment_delete' article.pk comment.pk %}" method='POST'>
+            			  {% csrf_token %}
+            			  <button class="float-right btn btn-primary">Delete</button>
+            		  </form>
+            	</div>
+            		{% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+	  <!--{% for comment in comments.all %}-->
+   <!--   {% if comment.user.points < 10 %}-->
+   <!--     <img src="../../../../static/rank_1.png" height="35" width="35">-->
+   <!--   {% elif 10 <= comment.user.points and comment.user.points < 20 %}-->
+   <!--     <img src="../../../../static/rank_2.png" height="35" width="35">-->
+   <!--   {% elif 20 <= comment.user.points and comment.user.points < 30 %}-->
+   <!--     <img src="../../../../static/rank_3.png" height="35" width="35">-->
+   <!--   {% else %}-->
+   <!--     <img src="../../../../static/rank_4.png" height="35" width="35">-->
+   <!--   {% endif %}-->
+   <!--   <p>{{ comment.user.nickname }}</p>-->
+		 <!-- <li>{{ comment.content }}</li>-->
+		 <!-- {% if request.user == comment.user %}-->
+  	<!--	  <form action="{% url 'movies:comment_delete' article.pk comment.pk %}" method='POST'>-->
+  	<!--		  {% csrf_token %}-->
+  	<!--		  <button>Delete</button>-->
+  	<!--	  </form>-->
+  	<!--	{% endif %}-->
+  	<!--{% endfor %}-->
+	  <hr>
+	  <a href="{% url 'movies:article_list' %}"<button class="btn btn-primary">BACK</button></a>
+
+	  <style>
+	    .myLike {
+	       position: absolute;
+         top: 50px;
+         right: 10px;
+         width: 50;
+         height: 50;
+	    }
+      .myArticleWriter {
+	       position: absolute;
+         top: 45px;
+         left: 17px;
+         width: 50;
+         height: 50;
+      }
+
+	  </style>
+{% endblock %}

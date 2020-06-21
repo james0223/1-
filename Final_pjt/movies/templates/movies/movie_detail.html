@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load bootstrap_pagination %}
+{% block content %}
+<div class="container ml-auto mr-auto pt-3 w-75">
+    <div class="d-flex">
+      <img class="" src="https://image.tmdb.org/t/p/original{{movie.poster_path}}"class="card-img-top" alt="..." style="height:350px; width:250px" id="mainImg" >
+
+      <div class="container">
+        <h2 class="m-2 font-weight-bolder">{{ movie.title }}</h2>
+
+       <span class="font-weight-bold mr-2 ml-2">TMDB 평점 : {{movie.vote_average}}</span>
+       <span class="font-weight-bold mr-2 ml-2">SAM 평점 : {{movie.site_average}}</span>
+       <span class="font-weight-bold ml-2">장르 :</span>
+
+        {% for genre in movie.genres.all %}
+          <span class="mr-2 font-weight-bold">{{ genre.name }}</span>
+        {% endfor %}
+      <br>
+      <hr>
+      <p class="">{{ movie.overview }}</p>
+      <span>개봉일: {{movie.release_date}}</span>
+    </div>
+
+  </div>
+
+    <button type="button" class="d-flex btn btn-danger float-right mb-3" data-toggle="modal" data-target="#youtubeModal">
+      <i class="mr-2 mt-1 align-middle fas fa-play-circle"></i>예고편
+    </button>
+    <br>
+    <hr class="mt-5">
+    <!-- Button trigger modal -->
+
+    <!-- <a href="" data-toggle="modal" data-target="#youtubeModal" class="d-flex btn btn-primary float-right mb-3"><i class="fas fa-play-circle"></i> Trailer</a> -->
+    <!-- Modal -->
+    <div class="modal fade" id="youtubeModal" tabindex="-1" role="dialog" aria-labelledby="youtubeModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="youtubeModalLabel">예고편</h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {% for youtube_item in youtube_items %}
+              <h6>{{youtube_item.snippet.title}}</h6>
+            <embed src="https://www.youtube.com/embed/{{youtube_item.id.videoId}}" width='720' height="480">
+
+            </embed>
+
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <table class="table style="table-layout:fixed"">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Rank</th>
+          <th scope="col">User</th>
+          <th scope="col">Opinion</th>
+          <th scope="col">Created at</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for comment in page_obj %}
+          <tr>
+            <td style="width:10%">
+              <span>
+                {% if comment.user.points < 10 %}
+                  <img src="../../../../static/rank_1.png" height="35" width="35">
+                {% elif 10 <= comment.user.points and comment.user.points < 20 %}
+                  <img src="../../../../static/rank_2.png" height="35" width="35">
+                {% elif 20 <= comment.user.points and comment.user.points < 30 %}
+                  <img src="../../../../static/rank_3.png" height="35" width="35">
+                {% else %}
+                  <img src="../../../../static/rank_4.png" height="35" width="35">
+                {% endif %}
+
+              </span>
+
+            </td>
+            <td style="width:15%"><a href="{% url 'accounts:profile' comment.user.username %}">{{ comment.user.nickname }}</a></td>
+            <td style="width:45%">{{ comment.content }}</td>
+            <td>
+              <div class="d-inline">
+                {{ comment.created_at}}
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!--  <tbody>-->
+    <!--    {% for comment in page_obj %}-->
+    <!--      <tr>-->
+    <!--        <td><a href="{% url 'accounts:profile' comment.user.username %}">{{ comment.user.nickname }}</a></td>-->
+    <!--        <td>{{ comment.content}}</td>-->
+    <!--        <td>{{ comment.rank }}</td>-->
+    <!--      </tr>-->
+    <!--    {% endfor %}-->
+    <!--  </tbody>-->
+    <!--</table>-->
+    <div class="d-flex justify-content-center mt-5">{% bootstrap_paginate page_obj range=5 show_prev_next="false" show_first_last="true" %}</div>
+
+    {% if user.is_authenticated %}
+      {% if find > 0 %}
+        <!-- {{find}}<br>
+        {{usercomment}}<br>
+        {{ls}}
+        {{movie.pk}}<br>
+        {{mcommentid}}g
+        {{lst}}
+        <br><br>
+        {{result}}  -->
+        <form action="{% url 'movies:movie_co_update' movie.pk result %}" method='POST'>
+          {% csrf_token %}
+          {% bootstrap_form form %}
+              <button class="d-inline btn btn-dark btn btn-danger float-right">Edit <i class="far fa-edit"></i></button>
+        </form>
+        <a href="{% url 'movies:movie_co_delete' movie.pk result %}"><button class ='btn btn-primary ml-auto'>Delete <i class="far fa-trash-alt"></i></button></a>
+
+      {% else %}
+        <form action="{% url 'movies:movie_co_create' movie.pk %}" method='POST'>
+          {% csrf_token %}
+          {% bootstrap_form form %}
+          <button class="btn btn-dark">Submit</button>
+        </form>
+      {% endif %}
+    {%  else %}
+        <form action="{% url 'accounts:login' %}">
+          <button class ='btn btn-primary'>LOGIN</button>
+        </form>
+    {% endif %}
+</div>
+
+
+{% endblock %}
+
+
+    <!--      <th scope="row"><a href="#" class="text-decoration-none text-dark">{{ comment.rank }}</a></th>-->
+    <!--      <td style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">{{ comment.content}}</td>-->
+    <!--      <td style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"><a href="{% url 'accounts:profile' comment.user.username %}" class="text-decoration-none text-dark">{{ comment.user.username }}</a></td>-->

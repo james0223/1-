@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+    var data = google.visualization.arrayToDataTable([
+      ['Genre', 'Watched'],
+      ["Action",     {{ action.value }}],
+      ['Animation',      {{ animation.value }}],
+      ['Comedy',  {{ comedy.value }}],
+      ['Crime', {{ crime.value }}],
+      ['Documentary',    {{ documentary.value }}],
+      ['Drama',    {{ drama.value }}],
+      ['Family',    {{ family.value }}],
+      ['Fantasy',    {{ fantasy.value }}],
+      ['History',    {{ history.value }}],
+      ['Horror',    {{ horror.value }}],
+      ['Music',    {{ music.value }}],
+      ['Mystery',    {{ mystery.value }}],
+      ['Romance',    {{ romance.value }}],
+      ['Science Fiction',    {{ sf.value }}],
+      ['TV Movie',    {{ tvm.value }}],
+      ['Thriller',    {{ thriller.value }}],
+      ['War',    {{ war.value }}],
+      ['Western',    {{ western.value }}],
+
+    ]);
+
+    var options = {
+      title: ''
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+    chart.draw(data, options);
+  }
+</script>
+{% if user == person %}
+    <h1>Welcome {{ person.nickname }}!!</h1>
+    <a href="{% url 'accounts:update' person.username %}">Update</a>
+{% else %}
+    <h1>This is {{ person.nickname }}'s page!!</h1>
+{% endif %}
+<br>
+<div class="row">
+    <div class="mr-4">
+        {% if person.avatar %}
+            <img src="{{ person.avatar.url }}" height="300" width="240">
+        {% else %}
+            <img src="../../../../static/base_img.jpg" height="300" width="240">
+        {% endif %}
+    </div>
+    <!--<hr>-->
+
+    <div class="ml-5">
+        {% if person.points < 10 %}
+            <img src="../../../../static/rank_1.png" height="50" width="50">
+        {% elif 10 <= person.points and person.points < 20 %}
+            <img src="../../../../static/rank_2.png" height="50" width="50">
+        {% elif 20 <= person.points and person.points < 30 %}
+            <img src="../../../../static/rank_3.png" height="50" width="50">
+        {% else %}
+            <img src="../../../../static/rank_4.png" height="50" width="50">
+        {% endif %}
+        <h4>{{ person.nickname }}'s points: {{person.points}}</h4>
+        <br>
+        {% if request.user != person %}
+            {% if person in request.user.following.all %}
+            <a href="{% url 'accounts:follow' person.username %}">UNFOLLOW</a>
+            {% else %}
+            <a href="{% url 'accounts:follow' person.username %}">FOLLOW</a></a>
+            {% endif %}
+        {% endif %}
+
+        <h5>{{ person.follower.all.count }} users are following {{ person.nickname }}!</h5>
+        <h5> {{ person.nickname }} is following {{ person.following.all.count }} users</h5>
+        <br>
+        <h4>Words from {{person.nickname}}:</h4>
+        <h3>{{ person.description}}</h3>
+    </div>
+</div>
+
+<hr>
+<h2>Enjoyed Genres</h2>
+<br>
+{% if flag == 0 %}
+<h5>No data</h5>
+{% else %}
+<div id="piechart" style="width: 900px; height: 500px;"></div>
+{% endif %}
+<hr>
+<h3>Written Articles</h3>
+{% if not articles %}
+    <p>No written articles</p>
+{% else %}
+{% for article in articles %}
+    <a href="{% url 'movies:article_detail' article.pk %}">
+        <p>{{ article.title }}</p>
+        <hr>
+    </a>
+{% endfor %}
+{% endif %}
+<hr>
+<h3>Liked Articles</h3>
+{% if not liked_articles %}
+    <p>No liked articles</p>
+{% else %}
+{% for liked_article in liked_articles %}
+    <a href="{% url 'movies:article_detail' liked_article.pk %}">
+        <p>{{ liked_article.title }}</p>
+    </a>
+{% endfor %}
+{% endif %}
+{% endblock %}

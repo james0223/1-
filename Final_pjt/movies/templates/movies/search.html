@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+
+<body>
+
+    {% block content %}
+
+    {% if res %}
+    {% if res|length == 1%}
+    <h3>{{Sum}} result found:</h3>
+    {% else %}
+    <h3>{{Sum}} results found:</h3>
+    {% endif %}
+    <div class="row my-3">
+        {% for movie in res %}
+            <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3" >
+                    <div class="card text-white">
+                        <img class="card-img" src="https://image.tmdb.org/t/p/original{{movie.backdrop_path}}" alt="Card image" style="height:200px;" >
+                        <div class="card-img-overlay ovl">
+                            <h5 class="d-flex card-title">{{movie.title}}</h5>
+                            <h6 class="d-flex card-text">{{movie.date}}</h6>
+                            <h6 class="ellipsis_multi card-text target">{{movie.overview}}</h6>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title d-flex justify-content-center" ><strong><a href="{% url 'movies:movie_detail' movie.id %}">{{movie.title|truncatechars:15}}</a></strong></h6>
+                        <div class="d-flex justify-content-center ">
+                            <h2><img src="../../../../static/star.jpg" alt="" width="35" height="35"> {{ movie.vote_average }}</h2>
+                        </div>
+                    </div>
+                <a href="{% url 'movies:movie_detail' movie.id  %}" class="btn btn-primary btn-lg btn-block card-img-base"><i class="fas fa-info-circle"></i> Detail</a>
+                </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <h4>Sorry, no results found for '{{search}}' <i class="fas fa-sad-tear"></i>.</h4>
+    <h5>Why don't you look around many movies we have?</h5><br>
+    <div class="row my-3">
+        {% for movie in movies %}
+            <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3" >
+                    <div class="card text-white">
+                        <img class="card-img" src="https://image.tmdb.org/t/p/original{{movie.backdrop_path}}" alt="Card image" style="height:200px;" >
+                        <div class="card-img-overlay ovl">
+                            <h5 class="d-flex card-title">{{movie.title}}</h5>
+                            <h6 class="d-flex card-text">{{movie.release_date}}</h6>
+                            <h6 class="ellipsis_multi card-text target">{{movie.overview}}</h6>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title d-flex justify-content-center" ><strong><a href="{% url 'movies:movie_detail' movie.id %}">{{movie.title|truncatechars:15}}</a></strong></h6>
+                        <div class="d-flex justify-content-center ">
+                            <h2><img src="../../../../static/star.jpg" alt="" width="35" height="35"> {{ movie.vote_average }}</h2>
+                        </div>
+                    </div>
+                <a href="{% url 'movies:movie_detail' movie.id  %}" class="btn btn-primary btn-lg btn-block card-img-base"><i class="fas fa-info-circle"></i> Detail</a>
+                </div>
+        {% endfor %}
+    </div>
+
+    {% endif %}
+
+    {% endblock %}
+</body>

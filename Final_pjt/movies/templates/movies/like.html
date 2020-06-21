@@ -1,0 +1,10 @@
+<div>
+    <a href="{% url 'movies:like' article.pk %}">
+        {% if user in article.like_users.all %}
+        <i class="fas fa-heart"></i>
+        {% else %}
+        <i class="far fa-heart"></i>
+        {% endif %}
+    </a>
+    <p>like: {{article.like_users.count }}</p>
+</div>
